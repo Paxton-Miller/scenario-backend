@@ -1,0 +1,109 @@
+package com.ogms.scenario.controller;
+
+import com.ogms.scenario.common.R;
+import com.ogms.scenario.domain.constants.Constants;
+import com.ogms.scenario.domain.dto.common.BaseQueryDto;
+import com.ogms.scenario.domain.dto.common.BaseResultDto;
+import com.ogms.scenario.domain.dto.user.UserAddDto;
+import com.ogms.scenario.domain.dto.user.UserLoginDto;
+import com.ogms.scenario.domain.dto.user.UserQueryDto;
+import com.ogms.scenario.domain.entity.User;
+import com.ogms.scenario.domain.vo.PaginationResultVo;
+import com.ogms.scenario.service.IUserService;
+import com.ogms.scenario.utils.JwtUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * @name: UserController
+ * @description: 用户控制器
+ * @author: Lingkai Shi
+ * @date: 4/10/2024 7:33 PM
+ * @version: 1.0
+ */
+
+@Slf4j
+@CrossOrigin
+@RestController
+@RequestMapping("/user")
+@Api(value = "User API", tags = {"User"})
+public class UserController {
+    @Autowired
+    private IUserService userService; // 自动将实现了 IUserService 接口的 Bean 对象注入到 userService 字段中
+
+    @ApiOperation("获取所有用户数据")
+    @GetMapping("/getAll")
+    @PreAuthorize("hasAuthority('admin')")
+    public R<PaginationResultVo> getAllUser(@ModelAttribute BaseQueryDto query) {
+        return R.success(userService.getAllUser(query), "获取成功");
+    }
+
+    @ApiOperation("通过id获取用户数据")
+    @GetMapping("/getById")
+    @PreAuthorize("hasAuthority('admin')")
+    public R<User> getUserById(Integer id) {
+        return R.success(userService.getById(id), "获取成功");
+    }
+
+    @ApiOperation("通过idList获取用户数据")
+    @GetMapping("/getByIds")
+    @PreAuthorize("hasAuthority('admin')")
+    public R<PaginationResultVo> getUserByIds(@ModelAttribute UserQueryDto query) {
+        return R.success(userService.getUserByIds(query), "获取成功");
+    }
+
+    @ApiOperation("用户登录")
+    @PostMapping("/login")
+    public R login(HttpServletRequest request, @RequestBody UserLoginDto userLoginDto) {
+        try {
+            BaseResultDto loginResultDto = userService.login(userLoginDto);
+            if (loginResultDto.getStatus()) {
+                request.getSession().setAttribute(Constants.SESSION_KEY, loginResultDto.getResult());
+                return R.success(loginResultDto.getResult());
+            } else {
+                request.getSession().removeAttribute(Constants.CHECK_CODE_KEY);
+                return R.fail(loginResultDto.getResult().toString().trim());
+            }
+        } finally {
+            request.getSession().removeAttribute(Constants.CHECK_CODE_KEY);
+        }
+    }
+
+    @ApiOperation("用户登出")
+    @GetMapping("/logout")
+    @PreAuthorize("hasAuthority('admin')")
+    public R logout() {
+        BaseResultDto logoutResultDto = userService.logout();
+        if (logoutResultDto.getStatus()) {
+            return R.success(logoutResultDto.getResult());
+        } else {
+            return R.fail(logoutResultDto.getResult().toString().trim());
+        }
+    }
+
+    @ApiOperation("用户注册")
+    @PostMapping("/add")
+    public R addUser(HttpServletRequest request, @RequestBody UserAddDto userAddDto) {
+        Integer createUserId = null;
+        try {
+            createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
+        } finally {
+            BaseResultDto baseAddResultDto;
+            if (createUserId == null)
+                baseAddResultDto = userService.addUser(userAddDto);
+            else
+                baseAddResultDto = userService.addUser(createUserId, userAddDto);
+            if (baseAddResultDto.getStatus()) {
+                return R.success(baseAddResultDto.getResult());
+            } else {
+                return R.fail(baseAddResultDto.getResult().toString().trim());
+            }
+        }
+    }
+}
