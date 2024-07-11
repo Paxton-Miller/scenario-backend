@@ -1,4 +1,4 @@
-# DataCenter-Backend
+# Scenario-Backend
 
 ## Table of contents
 
@@ -16,4 +16,4 @@ You can open http://localhost:8898/swagger-ui.html#/ in your browser so you can 
 
 ## Database
 ### MySQL
-You may want to configure the MySQL connection information in application.yml, especially the username, password and the db name. Note that the MySQL port is "3306" and you can find the sql file "dc.sql" in root path and execute it in Navicat.
+You may want to configure the MySQL connection information in application.yml, especially the username, password and the db name. Note that the MySQL port is "3306" and you can find the sql file "scenario.sql" in root path and execute it in Navicat.
