@@ -94,15 +94,15 @@ public class UserController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto baseAddResultDto;
+            BaseResultDto addResultDto;
             if (createUserId == null)
-                baseAddResultDto = userService.addUser(userAddDto);
+                addResultDto = userService.addUser(userAddDto);
             else
-                baseAddResultDto = userService.addUser(createUserId, userAddDto);
-            if (baseAddResultDto.getStatus()) {
-                return R.success(baseAddResultDto.getResult());
+                addResultDto = userService.addUser(createUserId, userAddDto);
+            if (addResultDto.getStatus()) {
+                return R.success(addResultDto.getResult());
             } else {
-                return R.fail(baseAddResultDto.getResult().toString().trim());
+                return R.fail(addResultDto.getResult().toString().trim());
             }
         }
     }

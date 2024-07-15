@@ -28,7 +28,25 @@ public class Scenario extends BaseEntity {
 
     @NotNull
     @ApiModelProperty(required = true)
-    private Integer project_id;
+    private Integer projectId;
+
+    @NotNull
+    @ApiModelProperty(required = true)
+    private Float graphX;
+
+    @NotNull
+    @ApiModelProperty(required = true)
+    private Float graphY;
+
+    @NotNull
+    @ApiModelProperty(required = true)
+    private Float graphWidth;
+
+    @NotNull
+    @ApiModelProperty(required = true)
+    private Float graphHeight;
+
+    private String node;
 
     @NotNull
     @ApiModelProperty(example = "true", notes = "1表示普通用户", required = true)

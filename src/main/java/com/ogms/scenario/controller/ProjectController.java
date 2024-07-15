@@ -57,12 +57,12 @@ public class ProjectController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto baseAddResultDto;
-            baseAddResultDto = projectService.addProject(createUserId, projectAddDto);
-            if (baseAddResultDto.getStatus()) {
-                return R.success(baseAddResultDto.getResult());
+            BaseResultDto addResultDto;
+            addResultDto = projectService.addProject(createUserId, projectAddDto);
+            if (addResultDto.getStatus()) {
+                return R.success(addResultDto.getResult());
             } else {
-                return R.fail(baseAddResultDto.getResult().toString().trim());
+                return R.fail(addResultDto.getResult().toString().trim());
             }
         }
     }

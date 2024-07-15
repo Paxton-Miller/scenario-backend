@@ -10,6 +10,11 @@ spring:
       url: jdbc:mysql://localhost:3306/scenario?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password: 020105Slk
+      hikari:
+        connection-timeout: 30000  # 连接超时时间为30秒
+        idle-timeout: 600000       # 连接空闲超时时间为10分钟
+        maximum-pool-size: 10      # 连接池中最大连接数为10
+        minimum-idle: 5            # 连接池中最小空闲连接数为5
   # Redis
   redis:
     host: 127.0.0.1

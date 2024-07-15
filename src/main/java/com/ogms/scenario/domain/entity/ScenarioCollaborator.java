@@ -25,11 +25,11 @@ import javax.validation.constraints.NotNull;
 public class ScenarioCollaborator extends BaseEntity {
     @NotNull
     @ApiModelProperty(required = true)
-    private Integer scenario_id;
+    private Integer scenarioId;
 
     @NotNull
     @ApiModelProperty(required = true)
-    private Integer user_id;
+    private Integer userId;
 
     @NotNull
     @Enumerated(EnumType.STRING)
