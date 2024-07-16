@@ -1,7 +1,9 @@
 package com.ogms.scenario.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ogms.scenario.domain.constants.Constants;
 import com.ogms.scenario.domain.converter.ScenarioConverter;
 import com.ogms.scenario.domain.dto.common.BaseResultDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioAddDto;
@@ -15,6 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +56,41 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
                 .eq("project_id", id);
         List<ScenarioVo> scenarioVoList = scenarioConverter.poList2VoList(scenarioMapper.selectList(queryWrapper));
         return scenarioVoList;
+    }
+
+    @Override
+    public BaseResultDto saveScenarioGraphJsonById(Integer id, String graph) {
+        String filePath = Constants.GRAPH_JSON_PATH + File.separator + id.toString() + ".json";
+        try {
+            Files.createDirectories(Paths.get(Constants.GRAPH_JSON_PATH));
+            Files.write(Paths.get(filePath), graph.getBytes(StandardCharsets.UTF_8));
+            return new BaseResultDto(true, true);
+        } catch (IOException e) {
+            return new BaseResultDto<>(false, e.getMessage());
+        }
+    }
+
+    @Override
+    public BaseResultDto getScenarioGraphJsonById(Integer id) {
+        String filePath = Constants.GRAPH_JSON_PATH + File.separator + id.toString() + ".json";
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return new BaseResultDto<>(false, "File not found: " + filePath);
+        }
+
+        try {
+            String content = new String(Files.readAllBytes(file.toPath()));
+
+            Object json = JSON.parseObject(content);
+            // 可以将 JSON 对象转为 HashMap
+            // HashMap<String, Object> map = json.toMap();
+
+            // 在这里可以处理 json 对象，比如打印内容
+            return new BaseResultDto<>(true, json);
+        } catch (IOException e) {
+            return new BaseResultDto<>(false, e.getMessage());
+        }
     }
 
     @Override

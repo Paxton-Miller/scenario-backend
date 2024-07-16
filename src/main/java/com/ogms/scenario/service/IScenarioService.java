@@ -23,6 +23,10 @@ public interface IScenarioService extends IService<Scenario> {
 
     List<ScenarioVo> getAllScenarioByProjectId(Integer id);
 
+    BaseResultDto saveScenarioGraphJsonById(Integer id, String graph);
+
+    BaseResultDto getScenarioGraphJsonById(Integer id);
+
     BaseResultDto addScenario(Integer createUserId, ScenarioAddDto scenarioAddDto);
 
     BaseResultDto editScenario(Integer modifyUserId, ScenarioEditDto scenarioEditDto);

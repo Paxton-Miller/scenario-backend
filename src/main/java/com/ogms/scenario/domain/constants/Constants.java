@@ -1,5 +1,7 @@
 package com.ogms.scenario.domain.constants;
 
+import java.io.File;
+
 /**
  * @name: Constants
  * @description: 常量
@@ -15,4 +17,8 @@ public class Constants {
 
     // 用于签名加密的密钥，为一个字符串（需严格保密）
     public static final String JWT_KEY = "jwt_key";
+
+    public static final String ROOT_PATH = System.getProperty("user.dir");
+
+    public static final String GRAPH_JSON_PATH = "D:\\24PostGraduate\\ConceptualScenario\\graphJson";
 }

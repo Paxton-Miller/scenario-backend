@@ -1,10 +1,13 @@
 package com.ogms.scenario.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.ogms.scenario.common.R;
+import com.ogms.scenario.domain.constants.Constants;
 import com.ogms.scenario.domain.dto.common.BaseQueryDto;
 import com.ogms.scenario.domain.dto.common.BaseResultDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioAddDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioEditDto;
+import com.ogms.scenario.domain.entity.Project;
 import com.ogms.scenario.domain.entity.Scenario;
 import com.ogms.scenario.domain.vo.PaginationResultVo;
 import com.ogms.scenario.domain.vo.scenario.ScenarioVo;
@@ -16,10 +19,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -38,6 +47,14 @@ public class ScenarioController {
     @Autowired
     private IScenarioService scenarioService;
 
+    @ApiOperation("通过id获取场景数据")
+    @GetMapping("/getById")
+    @PreAuthorize("hasAuthority('admin')")
+    public R<Scenario> getScenarioById(Integer id) {
+        System.out.println(Constants.ROOT_PATH);
+        return R.success(scenarioService.getById(id), "获取成功");
+    }
+
     @ApiOperation("获取所有场景数据")
     @GetMapping("/getAll")
     @PreAuthorize("hasAuthority('admin')")
@@ -50,6 +67,32 @@ public class ScenarioController {
     @PreAuthorize("hasAuthority('admin')")
     public R<List<ScenarioVo>> getAllScenarioByProjectId(Integer id) {
         return R.success(scenarioService.getAllScenarioByProjectId(id), "获取成功");
+    }
+
+    @ApiOperation("存储graph对应的json文件")
+    @PostMapping("/saveGraphJsonById")
+    @PreAuthorize("hasAuthority('admin')")
+    public R saveScenarioGraphJsonById(Integer id, @RequestBody String graph) {
+//        JSON.toJSONString()
+        BaseResultDto saveResultDto = scenarioService.saveScenarioGraphJsonById(id, graph);
+        if (saveResultDto.getStatus()) {
+            return R.success(saveResultDto.getResult());
+        } else {
+            return R.fail(saveResultDto.getResult().toString().trim());
+        }
+    }
+
+    @ApiOperation("返回graph对应的json文件")
+    @GetMapping("/getGraphJsonById")
+    @PreAuthorize("hasAuthority('admin')")
+    public R getScenarioGraphJsonById(Integer id) {
+//        JSON.toJSONString()
+        BaseResultDto getResultDto = scenarioService.getScenarioGraphJsonById(id);
+        if (getResultDto.getStatus()) {
+            return R.success(getResultDto.getResult());
+        } else {
+            return R.fail(getResultDto.getResult().toString().trim());
+        }
     }
 
     @ApiOperation("增加一个场景")
@@ -112,7 +155,7 @@ public class ScenarioController {
             BaseResultDto batchEditResultDto;
             batchEditResultDto = scenarioService.batchEditScenario(modifyUserId, scenarioEditDtoList);
             if (batchEditResultDto.getStatus()) {
-                return R.success( batchEditResultDto.getResult());
+                return R.success(batchEditResultDto.getResult());
             } else {
                 return R.fail(batchEditResultDto.getResult().toString().trim());
             }
