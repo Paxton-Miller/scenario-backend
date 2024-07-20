@@ -8,6 +8,8 @@ import com.ogms.scenario.domain.entity.Project;
 import com.ogms.scenario.domain.entity.User;
 import com.ogms.scenario.domain.vo.PaginationResultVo;
 
+import java.util.List;
+
 /**
  * @name: IProjectService
  * @description: TODO
@@ -17,6 +19,8 @@ import com.ogms.scenario.domain.vo.PaginationResultVo;
  */
 public interface IProjectService extends IService<Project> {
     PaginationResultVo getAllProject(BaseQueryDto query);
+
+    PaginationResultVo getAllMyOwnProject(Integer userId, BaseQueryDto query);
 
     BaseResultDto addProject(Integer createUserId, ProjectAddDto projectAddDto);
 }

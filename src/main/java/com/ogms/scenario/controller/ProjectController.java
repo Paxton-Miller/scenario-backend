@@ -50,6 +50,14 @@ public class ProjectController {
         return R.success(projectService.getById(id), "获取成功");
     }
 
+    @ApiOperation("获取本人的项目数据")
+    @GetMapping("/getAllMyOwn")
+    @PreAuthorize("hasAuthority('admin')")
+    public R<PaginationResultVo> getAllMyOwnProject(HttpServletRequest request, @ModelAttribute BaseQueryDto query) {
+        Integer userId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
+        return R.success(projectService.getAllMyOwnProject(userId, query), "获取成功");
+    }
+
     @ApiOperation("项目添加")
     @PostMapping("/add")
     public R addProject(HttpServletRequest request, @RequestBody ProjectAddDto projectAddDto) {

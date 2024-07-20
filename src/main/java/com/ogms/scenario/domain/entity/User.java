@@ -41,6 +41,9 @@ public class User extends BaseEntity { // 序列化的主要目的是将对象�
     @ApiModelProperty(required = true)
     private String password;
 
+    @NotBlank
+    private String avatar;
+
     @NotNull
     @ApiModelProperty(example = "true", notes = "1表示普通用户", required = true)
     private Boolean type;

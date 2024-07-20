@@ -1,9 +1,13 @@
 package com.ogms.scenario.config;
 
+import com.ogms.scenario.domain.constants.Constants;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.yaml.snakeyaml.scanner.Constant;
+
+import java.io.File;
 
 /**
  * @name: WebMvcConfig

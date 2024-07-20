@@ -6,11 +6,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ogms.scenario.domain.constants.Constants;
 import com.ogms.scenario.domain.converter.ScenarioConverter;
 import com.ogms.scenario.domain.dto.common.BaseResultDto;
+import com.ogms.scenario.domain.dto.room.RoomAddDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioAddDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioEditDto;
 import com.ogms.scenario.domain.entity.Scenario;
+import com.ogms.scenario.domain.enums.PermissionLevelEnum;
 import com.ogms.scenario.domain.vo.scenario.ScenarioVo;
 import com.ogms.scenario.mapper.ScenarioMapper;
+import com.ogms.scenario.service.IRoomService;
 import com.ogms.scenario.service.IScenarioService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +41,9 @@ import java.util.stream.Collectors;
 public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> implements IScenarioService {
     @Autowired
     private ScenarioMapper scenarioMapper;
+
+    @Autowired
+    IRoomService roomService;
 
     @Resource
     private ScenarioConverter scenarioConverter;
@@ -76,7 +83,7 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
 
         File file = new File(filePath);
         if (!file.exists()) {
-            return new BaseResultDto<>(false, "File not found: " + filePath);
+            return new BaseResultDto<>(true, null);
         }
 
         try {
@@ -100,6 +107,9 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
             scenario.setCreateUserId(createUserId);
             scenarioMapper.insert(scenario);
             scenario = scenarioMapper.selectById(scenario.getId());
+            // 直接添加初始协作室
+            RoomAddDto roomAddDto = new RoomAddDto(createUserId + ",", PermissionLevelEnum.write, scenario.getId(), "");
+            roomService.addRoom(createUserId, roomAddDto);
             return new BaseResultDto<>(true, scenarioConverter.po2Vo(scenario));
         } catch (Exception ex) {
             return new BaseResultDto<>(false, ex.getMessage());
@@ -119,6 +129,11 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
             }
             saveBatch(scenarioList);
             List<Integer> idList = scenarioList.stream().map(Scenario::getId).collect(Collectors.toList());
+            // 添加初始协作室
+            for (Integer id : idList) {
+                RoomAddDto roomAddDto = new RoomAddDto(createUserId + ",", PermissionLevelEnum.write, id, "");
+                roomService.addRoom(createUserId, roomAddDto);
+            }
             return new BaseResultDto<>(true, scenarioConverter.poList2VoList(scenarioMapper.selectBatchIds(idList)));
         } catch (Exception ex) {
             return new BaseResultDto<>(false, ex.getMessage());

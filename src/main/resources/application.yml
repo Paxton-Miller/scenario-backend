@@ -15,6 +15,12 @@ spring:
         idle-timeout: 600000       # 连接空闲超时时间为10分钟
         maximum-pool-size: 10      # 连接池中最大连接数为10
         minimum-idle: 5            # 连接池中最小空闲连接数为5
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
   # Redis
   redis:
     host: 127.0.0.1
@@ -27,6 +33,10 @@ spring:
         max-wait: -1
         max-idle: 5
         min-idle: 0
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 mybatis-plus:
   configuration:

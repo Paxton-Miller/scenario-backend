@@ -1,34 +1,23 @@
 package com.ogms.scenario.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.ogms.scenario.common.R;
 import com.ogms.scenario.domain.constants.Constants;
-import com.ogms.scenario.domain.dto.common.BaseQueryDto;
 import com.ogms.scenario.domain.dto.common.BaseResultDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioAddDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioEditDto;
-import com.ogms.scenario.domain.entity.Project;
 import com.ogms.scenario.domain.entity.Scenario;
-import com.ogms.scenario.domain.vo.PaginationResultVo;
 import com.ogms.scenario.domain.vo.scenario.ScenarioVo;
 import com.ogms.scenario.service.IScenarioService;
-import com.ogms.scenario.service.IUserService;
 import com.ogms.scenario.utils.JwtUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -51,7 +40,6 @@ public class ScenarioController {
     @GetMapping("/getById")
     @PreAuthorize("hasAuthority('admin')")
     public R<Scenario> getScenarioById(Integer id) {
-        System.out.println(Constants.ROOT_PATH);
         return R.success(scenarioService.getById(id), "获取成功");
     }
 

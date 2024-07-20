@@ -1,4 +1,4 @@
-package com.ogms.scenario.filter.handler;
+package com.ogms.scenario.filter.authHandler;
 
 import com.alibaba.fastjson.JSON;
 import com.ogms.scenario.common.R;

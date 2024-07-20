@@ -20,5 +20,9 @@ public class Constants {
 
     public static final String ROOT_PATH = System.getProperty("user.dir");
 
-    public static final String GRAPH_JSON_PATH = "D:\\24PostGraduate\\ConceptualScenario\\graphJson";
+    public static final String GRAPH_JSON_PATH = ROOT_PATH + File.separator + "assets" + File.separator + "graphJson";
+
+    public static final String RESOURCE_UPLOAD_PATH = ROOT_PATH + File.separator + "assets" + File.separator + "resource";
+
+    public static final String AVATAR_PATH = ROOT_PATH + File.separator + "assets" + File.separator + "avatar";
 }

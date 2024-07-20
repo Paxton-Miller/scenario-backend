@@ -20,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.UUID;
 
 @Slf4j // Lombok注解，简化日志记录器的创建，自动生成getter、setter、构造函数、toString等方法
 @MapperScan("com.ogms.*.mapper") // MyBatis提供的，MapperScan操作数据库对象映射
