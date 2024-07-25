@@ -15,6 +15,7 @@ import com.ogms.scenario.domain.vo.scenario.ScenarioVo;
 import com.ogms.scenario.mapper.ScenarioMapper;
 import com.ogms.scenario.service.IRoomService;
 import com.ogms.scenario.service.IScenarioService;
+import com.sun.org.apache.bcel.internal.generic.SWITCH;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,21 +66,62 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
         return scenarioVoList;
     }
 
+    private String getJsonFileNameByType(Scenario scenario, String type) {
+        String fileName;
+        switch (type) {
+            case "time":
+                fileName = scenario.getTimeDimension();
+                break;
+            case "space":
+                fileName = scenario.getSpaceDimension();
+                break;
+            case "person":
+                fileName = scenario.getPersonDimension();
+                break;
+            case "object":
+                fileName = scenario.getObjectDimension();
+                break;
+            case "event":
+                fileName = scenario.getEventDimension();
+                break;
+            case "phenomenon":
+                fileName = scenario.getPhenomenonDimension();
+                break;
+            default:
+                return "Invalid dimension type";
+        }
+        return fileName;
+    }
+
     @Override
-    public BaseResultDto saveScenarioGraphJsonById(Integer id, String graph) {
-        String filePath = Constants.GRAPH_JSON_PATH + File.separator + id.toString() + ".json";
+    public BaseResultDto saveScenarioGraphJsonByIdAndType(Integer id, String type, String graph) {
+        Scenario scenario = scenarioMapper.selectById(id);
+        String fileName = getJsonFileNameByType(scenario, type);
+        if (fileName == "Invalid dimension type") {
+            return new BaseResultDto<>(false, "Invalid dimension type");
+        }
         try {
-            Files.createDirectories(Paths.get(Constants.GRAPH_JSON_PATH));
-            Files.write(Paths.get(filePath), graph.getBytes(StandardCharsets.UTF_8));
+            saveScenarioGraphJson(graph, type, fileName);
             return new BaseResultDto(true, true);
         } catch (IOException e) {
             return new BaseResultDto<>(false, e.getMessage());
         }
     }
 
+    private void saveScenarioGraphJson(String graph, String type, String fileName) throws IOException {
+        String filePath = Constants.GRAPH_JSON_PATH + File.separator + type + File.separator + fileName + ".json";
+        Files.createDirectories(Paths.get(Constants.GRAPH_JSON_PATH + File.separator + type));
+        Files.write(Paths.get(filePath), graph.getBytes(StandardCharsets.UTF_8));
+    }
+
     @Override
-    public BaseResultDto getScenarioGraphJsonById(Integer id) {
-        String filePath = Constants.GRAPH_JSON_PATH + File.separator + id.toString() + ".json";
+    public BaseResultDto getScenarioGraphJsonByIdAndType(Integer id, String type) {
+        Scenario scenario = scenarioMapper.selectById(id);
+        String fileName = getJsonFileNameByType(scenario, type);
+        if (fileName == "Invalid dimension type") {
+            return new BaseResultDto<>(false, "Invalid dimension type");
+        }
+        String filePath = Constants.GRAPH_JSON_PATH + File.separator + type + File.separator + fileName + ".json";
 
         File file = new File(filePath);
         if (!file.exists()) {
@@ -100,10 +142,35 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
         }
     }
 
+    private void setDimensionUUID(String json, Scenario scenario) throws IOException {
+        // save initial json for every dimension
+        String uuid = UUID.randomUUID().toString();
+        saveScenarioGraphJson(json, "time", uuid);
+        scenario.setTimeDimension(uuid);
+        uuid = UUID.randomUUID().toString();
+        saveScenarioGraphJson(json, "space", uuid);
+        scenario.setSpaceDimension(uuid);
+        uuid = UUID.randomUUID().toString();
+        saveScenarioGraphJson(json, "person", uuid);
+        scenario.setPersonDimension(uuid);
+        uuid = UUID.randomUUID().toString();
+        saveScenarioGraphJson(json, "object", uuid);
+        scenario.setObjectDimension(uuid);
+        uuid = UUID.randomUUID().toString();
+        saveScenarioGraphJson(json, "event", uuid);
+        scenario.setEventDimension(uuid);
+        uuid = UUID.randomUUID().toString();
+        saveScenarioGraphJson(json, "phenomenon", uuid);
+        scenario.setPhenomenonDimension(uuid);
+    }
+
     @Override
     public BaseResultDto addScenario(Integer createUserId, ScenarioAddDto scenarioAddDto) {
         try {
+            String emptyJson = "{\"cells\": []}";
             Scenario scenario = scenarioConverter.dto2Po(scenarioAddDto);
+            setDimensionUUID(emptyJson, scenario);
+
             scenario.setCreateUserId(createUserId);
             scenarioMapper.insert(scenario);
             scenario = scenarioMapper.selectById(scenario.getId());
@@ -125,6 +192,8 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
         try {
             List<Scenario> scenarioList = scenarioConverter.dtoList2PoList(scenarioAddDtoList);
             for (Scenario scenario : scenarioList) {
+                String emptyJson = "{\"cells\": []}";
+                setDimensionUUID(emptyJson, scenario);
                 scenario.setCreateUserId(createUserId);
             }
             saveBatch(scenarioList);

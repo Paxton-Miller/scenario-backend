@@ -11,6 +11,7 @@ import com.ogms.scenario.domain.dto.resource.ResourceAddDto;
 import com.ogms.scenario.domain.entity.Resource;
 import com.ogms.scenario.domain.vo.PaginationResultVo;
 import com.ogms.scenario.mapper.ResourceMapper;
+import com.ogms.scenario.mapper.ScenarioMapper;
 import com.ogms.scenario.service.IResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

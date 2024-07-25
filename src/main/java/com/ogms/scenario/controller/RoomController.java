@@ -2,9 +2,11 @@ package com.ogms.scenario.controller;
 
 import com.ogms.scenario.common.R;
 import com.ogms.scenario.domain.constants.Constants;
+import com.ogms.scenario.domain.dto.common.BaseQueryDto;
 import com.ogms.scenario.domain.dto.common.BaseResultDto;
 import com.ogms.scenario.domain.dto.room.RoomAddCollaboratorDto;
 import com.ogms.scenario.domain.dto.room.RoomAddDto;
+import com.ogms.scenario.domain.dto.room.RoomDelCollaboratorDto;
 import com.ogms.scenario.domain.dto.room.RoomEditDto;
 import com.ogms.scenario.domain.entity.Room;
 import com.ogms.scenario.service.IRoomService;
@@ -86,6 +88,28 @@ public class RoomController {
         } else {
             return R.fail(addResultDto.getResult().toString().trim());
         }
+    }
+
+    @ApiOperation("删除协作人员")
+    @PostMapping("/delCollaborator")
+    @PreAuthorize("hasAuthority('admin')")
+    public R delRoomCollaborator(HttpServletRequest request, @RequestBody RoomDelCollaboratorDto roomDelCollaboratorDto) {
+        Integer modifyUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
+        BaseResultDto delResultDto;
+        delResultDto = roomService.delRoomCollaborator(modifyUserId, roomDelCollaboratorDto);
+        if (delResultDto.getStatus()) {
+            return R.success(delResultDto.getResult());
+        } else {
+            return R.fail(delResultDto.getResult().toString().trim());
+        }
+    }
+
+    @ApiOperation("获取协作人员所参与的场景")
+    @GetMapping("/getScenarioInvolvedIn")
+    @PreAuthorize("hasAuthority('admin')")
+    public R getScenarioInvolvedIn(HttpServletRequest request, BaseQueryDto query) {
+        Integer createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
+        return R.success(roomService.getScenarioInvolvedIn(createUserId, query));
     }
 
     @ApiOperation("修改协作室")

@@ -6,6 +6,7 @@ import com.ogms.scenario.domain.dto.common.BaseResultDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioAddDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioEditDto;
 import com.ogms.scenario.domain.entity.Scenario;
+import com.ogms.scenario.domain.enums.DimensionType;
 import com.ogms.scenario.domain.vo.scenario.ScenarioVo;
 import com.ogms.scenario.service.IScenarioService;
 import com.ogms.scenario.utils.JwtUtils;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -58,11 +61,11 @@ public class ScenarioController {
     }
 
     @ApiOperation("存储graph对应的json文件")
-    @PostMapping("/saveGraphJsonById")
+    @PostMapping("/saveGraphJsonByIdAndType")
     @PreAuthorize("hasAuthority('admin')")
-    public R saveScenarioGraphJsonById(Integer id, @RequestBody String graph) {
+    public R saveScenarioGraphJsonByIdAndType(Integer id, DimensionType type, @RequestBody String graph) {
 //        JSON.toJSONString()
-        BaseResultDto saveResultDto = scenarioService.saveScenarioGraphJsonById(id, graph);
+        BaseResultDto saveResultDto = scenarioService.saveScenarioGraphJsonByIdAndType(id, type.toString(), graph);
         if (saveResultDto.getStatus()) {
             return R.success(saveResultDto.getResult());
         } else {
@@ -71,11 +74,11 @@ public class ScenarioController {
     }
 
     @ApiOperation("返回graph对应的json文件")
-    @GetMapping("/getGraphJsonById")
+    @GetMapping("/getGraphJsonByIdAndType")
     @PreAuthorize("hasAuthority('admin')")
-    public R getScenarioGraphJsonById(Integer id) {
+    public R getScenarioGraphJsonByIdAndType(Integer id, DimensionType type) {
 //        JSON.toJSONString()
-        BaseResultDto getResultDto = scenarioService.getScenarioGraphJsonById(id);
+        BaseResultDto getResultDto = scenarioService.getScenarioGraphJsonByIdAndType(id, type.toString());
         if (getResultDto.getStatus()) {
             return R.success(getResultDto.getResult());
         } else {

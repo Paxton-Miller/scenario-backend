@@ -77,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
                 .antMatchers("/swagger-ui.html", "/doc.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()
                 .antMatchers("/assets/resource/**","/assets/graphJson/**", "/assets/avatar/**").permitAll()
-                .antMatchers("/chatWs/**").permitAll()
+                .antMatchers("/chatWs/**", "/graphWs/**").permitAll()
                 .anyRequest().authenticated();
 
         // 添加token过滤器

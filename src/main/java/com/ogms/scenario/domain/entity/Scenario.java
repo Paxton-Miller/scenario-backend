@@ -48,6 +48,18 @@ public class Scenario extends BaseEntity {
 
     private String node;
 
+    private String timeDimension;
+
+    private String spaceDimension;
+
+    private String personDimension;
+
+    private String objectDimension;
+
+    private String eventDimension;
+
+    private String phenomenonDimension;
+
     @NotNull
     @ApiModelProperty(example = "true", notes = "1表示普通用户", required = true)
     private Boolean type;
