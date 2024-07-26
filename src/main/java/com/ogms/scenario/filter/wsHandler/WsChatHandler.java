@@ -1,6 +1,7 @@
 package com.ogms.scenario.filter.wsHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ogms.scenario.domain.constants.Constants;
 import com.ogms.scenario.domain.dto.session.Message;
 import com.ogms.scenario.domain.dto.session.RoomManageDto;
 import com.ogms.scenario.domain.dto.session.SessionBean;
@@ -18,7 +19,11 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,6 +69,43 @@ public class WsChatHandler extends AbstractWebSocketHandler {
         return -1;
     }
 
+    private String getWordCloud(String historyMsg) {
+        Process proc;
+        try {
+            // Set up the arguments in python file
+            String[] args1 = new String[]{Constants.PYTHON_INTERPRETER_PATH,
+                    String.valueOf(Paths.get(Constants.SCRIPT_PATH, "wordcloud.py")),
+                    String.valueOf(Paths.get(Constants.SCRIPT_PATH, "baidu_stopwords.txt")),
+                    historyMsg};
+            proc = Runtime.getRuntime().exec(args1);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream(), StandardCharsets.UTF_8));
+            String line, result = "";
+            while ((line = reader.readLine()) != null) {
+                result += line;
+            }
+            reader.close();
+            System.out.println(proc.waitFor());
+
+            // 读取标准错误流（如果有）
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(proc.getErrorStream(), StandardCharsets.UTF_8));
+            StringBuilder errorResult = new StringBuilder();
+            while ((line = errorReader.readLine()) != null) {
+                errorResult.append(line);
+                errorResult.append(System.lineSeparator());
+            }
+            proc.waitFor();
+            reader.close();
+            errorReader.close();
+            System.out.println("Error: " + errorResult.toString());
+
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
@@ -103,7 +145,9 @@ public class WsChatHandler extends AbstractWebSocketHandler {
         if (index != -1) {
             room = roomManager.get(index);
             log.info("Room " + index + ", Client " + room.sessionBeanMap.get(session.getId()).getClientId() + ":" + message.getPayload());
+            room.setHistoryMsg(room.getHistoryMsg() + payload + '\n');
             sendMessage(room.sessionBeanMap, objectMapper.writeValueAsString(new Message(payload, room.sessionBeanMap.get(session.getId()).getUserId(), true, new Date())));
+            sendMessage(room.sessionBeanMap, objectMapper.writeValueAsString(new Message(getWordCloud(room.getHistoryMsg()), room.sessionBeanMap.get(session.getId()).getUserId(), false, new Date())));
         }
     }
 

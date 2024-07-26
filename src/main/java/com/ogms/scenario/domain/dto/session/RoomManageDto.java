@@ -25,6 +25,8 @@ public class RoomManageDto {
 
     private String uuid;
 
+    private String historyMsg = "";
+
     public RoomManageDto(String uuid) {
         this.uuid = uuid;
     }
