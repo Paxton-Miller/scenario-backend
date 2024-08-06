@@ -27,6 +27,8 @@ public class Constants {
 
     public static final String AVATAR_PATH = ROOT_PATH + File.separator + "assets" + File.separator + "avatar";
 
+    public static final String MAPLOGO_PATH = ROOT_PATH + File.separator + "assets" + File.separator + "mapLogo";
+
     public static final String SCRIPT_PATH = String.valueOf(Paths.get(ROOT_PATH, "src", "main", "resources", "scripts"));
 
     // The Python Interpreter on Windows

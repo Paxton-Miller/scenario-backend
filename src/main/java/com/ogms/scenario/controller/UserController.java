@@ -79,12 +79,7 @@ public class UserController {
     @GetMapping("/logout")
     @PreAuthorize("hasAuthority('admin')")
     public R logout() {
-        BaseResultDto logoutResultDto = userService.logout();
-        if (logoutResultDto.getStatus()) {
-            return R.success(logoutResultDto.getResult());
-        } else {
-            return R.fail(logoutResultDto.getResult().toString().trim());
-        }
+        return R.handleService(() -> userService.logout());
     }
 
     @ApiOperation("用户注册")
@@ -94,15 +89,11 @@ public class UserController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto addResultDto;
             if (createUserId == null)
-                addResultDto = userService.addUser(userAddDto);
-            else
-                addResultDto = userService.addUser(createUserId, userAddDto);
-            if (addResultDto.getStatus()) {
-                return R.success(addResultDto.getResult());
-            } else {
-                return R.fail(addResultDto.getResult().toString().trim());
+                return R.handleService(() -> userService.addUser(userAddDto));
+            else {
+                Integer finalCreateUserId = createUserId;
+                return R.handleService(() -> userService.addUser(finalCreateUserId, userAddDto));
             }
         }
     }

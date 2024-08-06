@@ -27,11 +27,11 @@ public interface IRoomService extends IService<Room> {
 
     BaseResultDto addRoom(Integer createUserId, RoomAddDto roomAddDto);
 
-    BaseResultDto addRoomCollaborator(Integer modifyUserId, RoomAddCollaboratorDto roomAddCollaboratorDto);
+    /*BaseResultDto addRoomCollaborator(Integer modifyUserId, RoomAddCollaboratorDto roomAddCollaboratorDto);
 
     BaseResultDto delRoomCollaborator(Integer modifyUserId, RoomDelCollaboratorDto roomDelCollaboratorDto);
 
-    PaginationResultVo getScenarioInvolvedIn(Integer createUserId, BaseQueryDto query);
+    PaginationResultVo getScenarioInvolvedIn(Integer createUserId, BaseQueryDto query);*/
 
     BaseResultDto editRoom(Integer modifyUserId, RoomEditDto roomEditDto);
 

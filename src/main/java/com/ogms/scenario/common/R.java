@@ -1,8 +1,11 @@
 package com.ogms.scenario.common;
 
+import com.ogms.scenario.domain.dto.common.BaseResultDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.function.Supplier;
 
 /**
  * @name: R
@@ -52,5 +55,14 @@ public class R<T> {
 
     public static <T> R<T> fail(Integer code, String message) {
         return new R<>(code, message, null);
+    }
+
+    public static R handleService(Supplier<BaseResultDto> operation) {
+        BaseResultDto resultDto = operation.get();
+        if (resultDto.getStatus()) {
+            return R.success(resultDto.getResult());
+        } else {
+            return R.fail(resultDto.getResult().toString().trim());
+        }
     }
 }

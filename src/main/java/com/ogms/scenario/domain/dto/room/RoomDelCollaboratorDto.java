@@ -14,7 +14,7 @@ import lombok.Data;
 @ApiModel(description = "删除协作成员")
 public class RoomDelCollaboratorDto {
 
-    private String uuid;
+    private Integer roomId;
 
     private Integer userId;
 }

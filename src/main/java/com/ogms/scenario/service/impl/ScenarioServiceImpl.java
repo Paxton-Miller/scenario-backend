@@ -6,13 +6,17 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ogms.scenario.domain.constants.Constants;
 import com.ogms.scenario.domain.converter.ScenarioConverter;
 import com.ogms.scenario.domain.dto.common.BaseResultDto;
+import com.ogms.scenario.domain.dto.room.RoomAddCollaboratorDto;
 import com.ogms.scenario.domain.dto.room.RoomAddDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioAddDto;
 import com.ogms.scenario.domain.dto.scenario.ScenarioEditDto;
+import com.ogms.scenario.domain.entity.Room;
 import com.ogms.scenario.domain.entity.Scenario;
 import com.ogms.scenario.domain.enums.PermissionLevelEnum;
 import com.ogms.scenario.domain.vo.scenario.ScenarioVo;
+import com.ogms.scenario.mapper.RoomCollaboratorMapper;
 import com.ogms.scenario.mapper.ScenarioMapper;
+import com.ogms.scenario.service.IRoomCollaboratorService;
 import com.ogms.scenario.service.IRoomService;
 import com.ogms.scenario.service.IScenarioService;
 import com.sun.org.apache.bcel.internal.generic.SWITCH;
@@ -46,8 +50,13 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
     @Autowired
     IRoomService roomService;
 
+    @Autowired
+    IRoomCollaboratorService roomCollaboratorService;
+
     @Resource
     private ScenarioConverter scenarioConverter;
+    @Autowired
+    private RoomCollaboratorMapper roomCollaboratorMapper;
 
     @Override
     public List<ScenarioVo> getAllScenario() {
@@ -174,9 +183,20 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
             scenario.setCreateUserId(createUserId);
             scenarioMapper.insert(scenario);
             scenario = scenarioMapper.selectById(scenario.getId());
-            // 直接添加初始协作室
-            RoomAddDto roomAddDto = new RoomAddDto(createUserId + ",", PermissionLevelEnum.write, scenario.getId(), "");
-            roomService.addRoom(createUserId, roomAddDto);
+            // Insert the initial room directly
+            RoomAddDto roomAddDto = new RoomAddDto(scenario.getId(), "");
+            BaseResultDto addResult = roomService.addRoom(createUserId, roomAddDto);
+            Room room = new Room();
+            if (addResult.getStatus()) {
+                room = (Room)addResult.getResult();
+            } else {
+                return new BaseResultDto<>(false, addResult.getResult());
+            }
+            // Insert the initial room collaborator(the creator with admin level)
+            addResult = roomCollaboratorService.addRoomCollaborator(createUserId, new RoomAddCollaboratorDto(room.getId(), createUserId, PermissionLevelEnum.admin, ""));
+            if (!addResult.getStatus()) {
+                return new BaseResultDto<>(false, addResult.getResult());
+            }
             return new BaseResultDto<>(true, scenarioConverter.po2Vo(scenario));
         } catch (Exception ex) {
             return new BaseResultDto<>(false, ex.getMessage());
@@ -200,8 +220,20 @@ public class ScenarioServiceImpl extends ServiceImpl<ScenarioMapper, Scenario> i
             List<Integer> idList = scenarioList.stream().map(Scenario::getId).collect(Collectors.toList());
             // 添加初始协作室
             for (Integer id : idList) {
-                RoomAddDto roomAddDto = new RoomAddDto(createUserId + ",", PermissionLevelEnum.write, id, "");
-                roomService.addRoom(createUserId, roomAddDto);
+                // Insert the initial room directly
+                RoomAddDto roomAddDto = new RoomAddDto(id, "");
+                BaseResultDto addResult = roomService.addRoom(createUserId, roomAddDto);
+                Room room = new Room();
+                if (addResult.getStatus()) {
+                    room = (Room)addResult.getResult();
+                } else {
+                    return new BaseResultDto<>(false, addResult.getResult());
+                }
+                // Insert the initial room collaborator(the creator with admin level)
+                addResult = roomCollaboratorService.addRoomCollaborator(createUserId, new RoomAddCollaboratorDto(room.getId(), createUserId, PermissionLevelEnum.admin, ""));
+                if (!addResult.getStatus()) {
+                    return new BaseResultDto<>(false, addResult.getResult());
+                }
             }
             return new BaseResultDto<>(true, scenarioConverter.poList2VoList(scenarioMapper.selectBatchIds(idList)));
         } catch (Exception ex) {

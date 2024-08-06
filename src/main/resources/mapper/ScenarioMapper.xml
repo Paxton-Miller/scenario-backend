@@ -25,6 +25,7 @@
         room
         WHERE scenario.is_deleted = false
         AND scenario.project_id = project.id
+        AND room.scenario_id = scenario.id
         <if test="idList != null and idList.size() > 0">
             AND scenario.id IN
             <foreach item="item" index="index" collection="idList"

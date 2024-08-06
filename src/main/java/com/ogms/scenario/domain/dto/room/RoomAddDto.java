@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -22,16 +23,9 @@ import java.util.UUID;
  * @version: 1.0
  */
 @Data
+@NoArgsConstructor
 @ApiModel(description = "协作室信息添加")
 public class RoomAddDto {
-    @NotNull
-    @ApiModelProperty(required = true)
-    private String collaborator;
-
-    @NotBlank
-    @Enumerated(EnumType.STRING)
-    @ApiModelProperty(required = true)
-    private PermissionLevelEnum permissionLevel;
 
     @NotNull
     @JsonIgnore
@@ -39,13 +33,19 @@ public class RoomAddDto {
 
     @NotNull
     @ApiModelProperty(required = true)
+    private Integer limitation = 6;
+
+    @NotNull
+    @ApiModelProperty(required = true)
+    private Boolean isLinkWrite = true;
+
+    @NotNull
+    @ApiModelProperty(required = true)
     private Integer scenarioId;
 
     private String description = null;
 
-    public RoomAddDto(String collaborator, PermissionLevelEnum permissionLevel, Integer scenarioId, String description) {
-        this.collaborator = collaborator;
-        this.permissionLevel = permissionLevel;
+    public RoomAddDto(Integer scenarioId, String description) {
         this.scenarioId = scenarioId;
         this.description = description;
     }

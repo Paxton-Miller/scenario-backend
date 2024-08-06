@@ -60,13 +60,8 @@ public class ScenarioRelationController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto addResultDto;
-            addResultDto = scenarioRelationService.addScenarioRelation(createUserId, scenarioRelationAddDto);
-            if (addResultDto.getStatus()) {
-                return R.success(addResultDto.getResult());
-            } else {
-                return R.fail(addResultDto.getResult().toString().trim());
-            }
+            Integer finalCreateUserId = createUserId;
+            return R.handleService(() -> scenarioRelationService.addScenarioRelation(finalCreateUserId, scenarioRelationAddDto));
         }
     }
 
@@ -78,13 +73,8 @@ public class ScenarioRelationController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto addResultDto;
-            addResultDto = scenarioRelationService.batchAddScenarioRelation(createUserId, scenarioRelationAddDtoList);
-            if (addResultDto.getStatus()) {
-                return R.success(addResultDto.getResult());
-            } else {
-                return R.fail(addResultDto.getResult().toString().trim());
-            }
+            Integer finalCreateUserId = createUserId;
+            return R.handleService(() -> scenarioRelationService.batchAddScenarioRelation(finalCreateUserId, scenarioRelationAddDtoList));
         }
     }
 
@@ -93,12 +83,7 @@ public class ScenarioRelationController {
     @PreAuthorize("hasAuthority('admin')")
     public R editScenarioRelation(HttpServletRequest request, @RequestBody ScenarioRelationEditDto scenarioRelationEditDto) {
         Integer modifyUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
-        BaseResultDto editResultDto = scenarioRelationService.editScenarioRelation(modifyUserId, scenarioRelationEditDto);
-        if (editResultDto.getStatus()) {
-            return R.success(editResultDto.getResult());
-        } else {
-            return R.fail(editResultDto.getResult().toString().trim());
-        }
+        return R.handleService(() -> scenarioRelationService.editScenarioRelation(modifyUserId, scenarioRelationEditDto));
     }
 
     @ApiOperation("批量编辑场景关系数据")
@@ -109,13 +94,8 @@ public class ScenarioRelationController {
         try {
             modifyUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto batchEditResultDto;
-            batchEditResultDto = scenarioRelationService.batchEditScenarioRelation(modifyUserId, scenarioRelationEditDtoList);
-            if (batchEditResultDto.getStatus()) {
-                return R.success( batchEditResultDto.getResult());
-            } else {
-                return R.fail(batchEditResultDto.getResult().toString().trim());
-            }
+            Integer finalModifyUserId = modifyUserId;
+            return R.handleService(() -> scenarioRelationService.batchEditScenarioRelation(finalModifyUserId, scenarioRelationEditDtoList));
         }
     }
 
@@ -123,23 +103,13 @@ public class ScenarioRelationController {
     @DeleteMapping("/del")
     @PreAuthorize("hasAuthority('admin')")
     public R<Boolean> delScenarioRelation(@RequestParam Integer id) {
-        BaseResultDto<Boolean> delResultDto = scenarioRelationService.delScenarioRelation(id);
-        if (delResultDto.getStatus()) {
-            return R.success(delResultDto.getResult());
-        } else {
-            return R.fail();
-        }
+        return R.handleService(() -> scenarioRelationService.delScenarioRelation(id));
     }
 
     @ApiOperation("批量删除场景关系")
     @DeleteMapping("/batchDel")
     @PreAuthorize("hasAuthority('admin')")
     public R<Boolean> batchDelScenarioRelation(@RequestBody @ApiParam(value = "条目id数组", required = true) List<Integer> idList) {
-        BaseResultDto<Boolean> batchDelResultDto = scenarioRelationService.batchDelScenarioRelation(idList);
-        if (batchDelResultDto.getStatus()) {
-            return R.success(batchDelResultDto.getResult());
-        } else {
-            return R.fail();
-        }
+        return R.handleService(() -> scenarioRelationService.batchDelScenarioRelation(idList));
     }
 }

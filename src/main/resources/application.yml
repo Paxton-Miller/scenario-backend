@@ -3,7 +3,6 @@ server:
 spring:
   application:
     name: scenario
-
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -37,7 +36,12 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-
+mongo-plus:
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      database: scenario
 mybatis-plus:
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射

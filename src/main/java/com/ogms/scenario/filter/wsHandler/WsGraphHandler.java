@@ -41,9 +41,14 @@ public class WsGraphHandler extends AbstractWebSocketHandler {
 
     private ObjectMapper objectMapper = new ObjectMapper(); // 将消息对象转换为json字符串
 
+    private StringBuffer messageBuffer = new StringBuffer();
+
     protected static List<RoomManageDto> roomManager;
     protected static Integer userId = 0; // 貌似无用
     protected static User user;
+
+    private static final int CHUNK_SIZE = 1024; // 分片大小，1 KB
+    private static final String END_OF_MSG = "<EOF>";
 
     static {
         roomManager = new ArrayList<>();
@@ -119,12 +124,23 @@ public class WsGraphHandler extends AbstractWebSocketHandler {
         Integer index = isExistInManager(session.getAttributes().get("uuid").toString());
         RoomManageDto room;
         if (index != -1) {
-            room = roomManager.get(index);
-            log.info("Room " + index + ", Client " + room.sessionBeanMap.get(session.getId()).getClientId() + ":" + message.getPayload());
-            Message msg = new Message(payload, room.sessionBeanMap.get(session.getId()).getUserId(), true,
-                    session.getAttributes().get("type").toString(), new Date());
-            sendMessage(room.sessionBeanMap, objectMapper.writeValueAsString(msg));
+            // handle partial msg
+            handleBufferMessage(message);
+            if (message.isLast()) {
+                room = roomManager.get(index);
+                log.info("Room " + index + ", Client " + room.sessionBeanMap.get(session.getId()).getClientId() + ":" + message.getPayload());
+                Message msg = new Message(messageBuffer.toString(), room.sessionBeanMap.get(session.getId()).getUserId(), true,
+                        session.getAttributes().get("type").toString(), new Date());
+                // clear for the next buffer message
+                messageBuffer.setLength(0);
+                sendMessage(room.sessionBeanMap, objectMapper.writeValueAsString(msg));
+            }
         }
+    }
+
+    private void handleBufferMessage(TextMessage message) {
+        String payload = message.getPayload();
+        messageBuffer.append(payload);
     }
 
     @Override
@@ -158,11 +174,25 @@ public class WsGraphHandler extends AbstractWebSocketHandler {
         }
     }
 
+    @Override
+    public boolean supportsPartialMessages() {
+        return true;
+    }
+
     private void sendMessage(Map<String, SessionBean> sessionBeanMap, String jsonMsg) throws IOException {
         // 给每一个加入群聊的人发消息
         for (String key : sessionBeanMap.keySet()) {
-            if (sessionBeanMap.get(key).getWebSocketSession().isOpen()) // new TextMessage(stringBuffer.toString())
-                sessionBeanMap.get(key).getWebSocketSession().sendMessage(new TextMessage(jsonMsg));
+            if (sessionBeanMap.get(key).getWebSocketSession().isOpen()) {// new TextMessage(stringBuffer.toString())
+                // 分片发送
+                int length = jsonMsg.length();
+                for (int start = 0; start < length; start += CHUNK_SIZE) {
+                    int end = Math.min(length, start + CHUNK_SIZE);
+                    String chunk = jsonMsg.substring(start, end);
+                    boolean isLast = (end == length);
+                    String chunkWithMarker = isLast ? chunk + END_OF_MSG : chunk;
+                    sessionBeanMap.get(key).getWebSocketSession().sendMessage(new TextMessage(chunkWithMarker, isLast));
+                }
+            }
         }
     }
 }

@@ -56,12 +56,7 @@ public class ResourceController {
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('admin')")
     public R uploadResource(String uuidName, @RequestParam("file") MultipartFile file) {
-        BaseResultDto uploadResultDto = resourceService.uploadResource(uuidName, file);
-        if (uploadResultDto.getStatus()) {
-            return R.success(uploadResultDto.getResult());
-        } else {
-            return R.fail(uploadResultDto.getResult().toString().trim());
-        }
+        return R.handleService(() -> resourceService.uploadResource(uuidName, file));
     }
 
     @ApiOperation("添加资源")
@@ -72,13 +67,8 @@ public class ResourceController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto addResultDto;
-            addResultDto = resourceService.addResource(createUserId, resourceAddDto);
-            if (addResultDto.getStatus()) {
-                return R.success(addResultDto.getResult());
-            } else {
-                return R.fail(addResultDto.getResult().toString().trim());
-            }
+            Integer finalCreateUserId = createUserId;
+            return R.handleService(() -> resourceService.addResource(finalCreateUserId, resourceAddDto));
         }
     }
 }

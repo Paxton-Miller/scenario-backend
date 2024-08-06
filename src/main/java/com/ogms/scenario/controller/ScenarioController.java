@@ -65,12 +65,7 @@ public class ScenarioController {
     @PreAuthorize("hasAuthority('admin')")
     public R saveScenarioGraphJsonByIdAndType(Integer id, DimensionType type, @RequestBody String graph) {
 //        JSON.toJSONString()
-        BaseResultDto saveResultDto = scenarioService.saveScenarioGraphJsonByIdAndType(id, type.toString(), graph);
-        if (saveResultDto.getStatus()) {
-            return R.success(saveResultDto.getResult());
-        } else {
-            return R.fail(saveResultDto.getResult().toString().trim());
-        }
+        return R.handleService(() -> scenarioService.saveScenarioGraphJsonByIdAndType(id, type.toString(), graph));
     }
 
     @ApiOperation("返回graph对应的json文件")
@@ -78,12 +73,7 @@ public class ScenarioController {
     @PreAuthorize("hasAuthority('admin')")
     public R getScenarioGraphJsonByIdAndType(Integer id, DimensionType type) {
 //        JSON.toJSONString()
-        BaseResultDto getResultDto = scenarioService.getScenarioGraphJsonByIdAndType(id, type.toString());
-        if (getResultDto.getStatus()) {
-            return R.success(getResultDto.getResult());
-        } else {
-            return R.fail(getResultDto.getResult().toString().trim());
-        }
+        return R.handleService(() -> scenarioService.getScenarioGraphJsonByIdAndType(id, type.toString()));
     }
 
     @ApiOperation("增加一个场景")
@@ -94,13 +84,8 @@ public class ScenarioController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto addResultDto;
-            addResultDto = scenarioService.addScenario(createUserId, scenarioAddDto);
-            if (addResultDto.getStatus()) {
-                return R.success(addResultDto.getResult());
-            } else {
-                return R.fail(addResultDto.getResult().toString().trim());
-            }
+            Integer finalCreateUserId = createUserId;
+            return R.handleService(() -> scenarioService.addScenario(finalCreateUserId, scenarioAddDto));
         }
     }
 
@@ -112,13 +97,8 @@ public class ScenarioController {
         try {
             createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto addResultDto;
-            addResultDto = scenarioService.batchAddScenario(createUserId, scenarioAddDtoList);
-            if (addResultDto.getStatus()) {
-                return R.success(addResultDto.getResult());
-            } else {
-                return R.fail(addResultDto.getResult().toString().trim());
-            }
+            Integer finalCreateUserId = createUserId;
+            return R.handleService(() -> scenarioService.batchAddScenario(finalCreateUserId, scenarioAddDtoList));
         }
     }
 
@@ -127,12 +107,7 @@ public class ScenarioController {
     @PreAuthorize("hasAuthority('admin')")
     public R editScenario(HttpServletRequest request, @RequestBody ScenarioEditDto scenarioEditDto) {
         Integer modifyUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
-        BaseResultDto editResultDto = scenarioService.editScenario(modifyUserId, scenarioEditDto);
-        if (editResultDto.getStatus()) {
-            return R.success(editResultDto.getResult());
-        } else {
-            return R.fail(editResultDto.getResult().toString().trim());
-        }
+        return R.handleService(() -> scenarioService.editScenario(modifyUserId, scenarioEditDto));
     }
 
     @ApiOperation("批量编辑场景数据")
@@ -143,13 +118,8 @@ public class ScenarioController {
         try {
             modifyUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         } finally {
-            BaseResultDto batchEditResultDto;
-            batchEditResultDto = scenarioService.batchEditScenario(modifyUserId, scenarioEditDtoList);
-            if (batchEditResultDto.getStatus()) {
-                return R.success(batchEditResultDto.getResult());
-            } else {
-                return R.fail(batchEditResultDto.getResult().toString().trim());
-            }
+            Integer finalModifyUserId = modifyUserId;
+            return R.handleService(() -> scenarioService.batchEditScenario(finalModifyUserId, scenarioEditDtoList));
         }
     }
 
@@ -157,23 +127,13 @@ public class ScenarioController {
     @DeleteMapping("/del")
     @PreAuthorize("hasAuthority('admin')")
     public R<Boolean> delScenario(@RequestParam Integer id) {
-        BaseResultDto<Boolean> delResultDto = scenarioService.delScenario(id);
-        if (delResultDto.getStatus()) {
-            return R.success(delResultDto.getResult());
-        } else {
-            return R.fail();
-        }
+        return R.handleService(() -> scenarioService.delScenario(id));
     }
 
     @ApiOperation("批量删除场景")
     @DeleteMapping("/batchDel")
     @PreAuthorize("hasAuthority('admin')")
     public R<Boolean> batchDelScenario(@RequestBody @ApiParam(value = "条目id数组", required = true) List<Integer> idList) {
-        BaseResultDto<Boolean> batchDelResultDto = scenarioService.batchDelScenario(idList);
-        if (batchDelResultDto.getStatus()) {
-            return R.success(batchDelResultDto.getResult());
-        } else {
-            return R.fail();
-        }
+        return R.handleService(() -> scenarioService.batchDelScenario(idList));
     }
 }

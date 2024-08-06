@@ -27,6 +27,7 @@ public class ResourceConfig extends WebMvcConfigurationSupport {
         registry.addResourceHandler("/assets/graphJson/**").addResourceLocations("file:" + Constants.GRAPH_JSON_PATH + File.separator);
         registry.addResourceHandler("/assets/resource/**").addResourceLocations("file:" + Constants.RESOURCE_UPLOAD_PATH + File.separator);
         registry.addResourceHandler("/assets/avatar/**").addResourceLocations("file:" + Constants.AVATAR_PATH + File.separator);
+        registry.addResourceHandler("/assets/mapLogo/**").addResourceLocations("file:" + Constants.MAPLOGO_PATH + File.separator);
         super.addResourceHandlers(registry);
     }
 }

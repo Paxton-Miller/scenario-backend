@@ -25,12 +25,11 @@ import javax.validation.constraints.NotNull;
 public class Room extends BaseEntity {
     @NotNull
     @ApiModelProperty(required = true)
-    private String collaborator;
+    private Integer limitation;
 
-    @NotBlank
-    @Enumerated(EnumType.STRING)
+    @NotNull
     @ApiModelProperty(required = true)
-    private PermissionLevelEnum permissionLevel;
+    private Boolean isLinkWrite;
 
     @NotNull
     @ApiModelProperty(required = true)

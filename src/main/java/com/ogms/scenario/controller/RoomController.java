@@ -76,7 +76,7 @@ public class RoomController {
         }
     }
 
-    @ApiOperation("增加协作人员")
+    /*@ApiOperation("增加协作人员")
     @PostMapping("/addCollaborator")
     @PreAuthorize("hasAuthority('admin')")
     public R addRoomCollaborator(HttpServletRequest request, @RequestBody RoomAddCollaboratorDto roomAddCollaboratorDto) {
@@ -110,30 +110,20 @@ public class RoomController {
     public R getScenarioInvolvedIn(HttpServletRequest request, BaseQueryDto query) {
         Integer createUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
         return R.success(roomService.getScenarioInvolvedIn(createUserId, query));
-    }
+    }*/
 
     @ApiOperation("修改协作室")
     @PostMapping("/edit")
     @PreAuthorize("hasAuthority('admin')")
     public R editRoom(HttpServletRequest request, @RequestBody RoomEditDto roomEditDto) {
         Integer modifyUserId = (Integer) JwtUtils.decodeToken(JwtUtils.extractTokenFromHeader(request.getHeader("Authorization"))).get("id");
-        BaseResultDto editResultDto = roomService.editRoom(modifyUserId, roomEditDto);
-        if (editResultDto.getStatus()) {
-            return R.success(editResultDto.getResult());
-        } else {
-            return R.fail(editResultDto.getResult().toString().trim());
-        }
+        return R.handleService(() -> roomService.editRoom(modifyUserId, roomEditDto));
     }
 
     @ApiOperation("删除协作室")
     @DeleteMapping("/del")
     @PreAuthorize("hasAuthority('admin')")
     public R<Boolean> delRoom(@RequestParam Integer id) {
-        BaseResultDto<Boolean> delResultDto = roomService.delRoom(id);
-        if (delResultDto.getStatus()) {
-            return R.success(delResultDto.getResult());
-        } else {
-            return R.fail();
-        }
+        return R.handleService(() -> roomService.delRoom(id));
     }
 }

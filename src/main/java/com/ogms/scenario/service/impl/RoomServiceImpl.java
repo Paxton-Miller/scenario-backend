@@ -81,7 +81,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements IR
         }
     }
 
-    @Override
+    /*@Override
     public BaseResultDto addRoomCollaborator(Integer modifyUserId, RoomAddCollaboratorDto roomAddCollaboratorDto) {
         Room room = getRoomByUUID(roomAddCollaboratorDto.getUuid());
         if (room == null) {
@@ -146,7 +146,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements IR
         PaginationResultVo paginationResultVo = new PaginationResultVo(page.getTotal(),
                 query.getPageSize(), query.getPage(), page.getPages(), page.getRecords());
         return paginationResultVo;
-    }
+    }*/
 
     @Override
     public BaseResultDto editRoom(Integer modifyUserId, RoomEditDto roomEditDto) {

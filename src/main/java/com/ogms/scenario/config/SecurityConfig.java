@@ -76,8 +76,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 任意用户，认证之后才可以访问（除上面外的）
 //                .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
                 .antMatchers("/swagger-ui.html", "/doc.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()
-                .antMatchers("/assets/resource/**","/assets/graphJson/**", "/assets/avatar/**").permitAll()
+                .antMatchers("/assets/resource/**","/assets/graphJson/**", "/assets/avatar/**", "/assets/mapLogo/**").permitAll()
                 .antMatchers("/chatWs/**", "/graphWs/**").permitAll()
+                .antMatchers("/geojson/**").permitAll() // 暂时这样设置哈
                 .anyRequest().authenticated();
 
         // 添加token过滤器
