@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.ogms</groupId>
-    <artifactId>scenario-backend</artifactId>
+    <artifactId>dsc-backend</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
